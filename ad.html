@@ -3,104 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Verification</title>
+    <title>Human Verification</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <!-- 1. तुमचा Monetag चा मुख्य टॅग -->
     <script src='//libtl.com/sdk.js' data-zone='11417452' data-sdk='show_11417452'></script>
 
     <style>
+        /* डार्क आणि मॉडर्न बॅकग्राउंड */
         body {
-            font-family: Arial, sans-serif;
-            background: #0f172a; /* डार्क बॅकग्राउंड */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
             color: #fff;
             text-align: center;
             padding: 20px;
             margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        /* बॉक्सचे डिझाईन आणि ॲनिमेशन */
         .container {
-            background: #1e293b;
-            padding: 30px 20px;
-            border-radius: 12px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px 25px;
+            border-radius: 20px;
             max-width: 400px;
-            margin: auto;
-            margin-top: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(2, 132, 199, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        h2 { color: #10b981; margin-bottom: 10px; font-size: 24px; }
-        p { font-size: 15px; color: #cbd5e1; margin-bottom: 30px; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* आयकॉन ॲनिमेशन */
+        .icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        h2 { 
+            color: #38bdf8; 
+            margin: 10px 0; 
+            font-size: 26px; 
+            font-weight: 700;
+        }
+        
+        p { 
+            font-size: 15px; 
+            color: #94a3b8; 
+            margin-bottom: 35px; 
+            line-height: 1.5;
+        }
+
+        /* बटनाचे भारी डिझाईन आणि Pulse ॲनिमेशन */
         .btn {
-            background-color: #475569;
+            background: linear-gradient(90deg, #0284c7, #2563eb);
             color: white;
             border: none;
             padding: 16px 20px;
             font-size: 18px;
-            border-radius: 8px;
-            cursor: not-allowed;
+            border-radius: 12px;
+            cursor: pointer;
             width: 100%;
             font-weight: bold;
-            transition: 0.3s;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            animation: pulse 2s infinite;
         }
-        .btn.active {
-            background-color: #0284c7; /* टेलिग्राम सारखा निळा रंग */
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:disabled {
+            background: #475569;
+            animation: none;
+            cursor: not-allowed;
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>🔒 Verification Check</h2>
-        <p>Please wait while we prepare your secure stream link.</p>
+        <div class="icon">🛡️</div>
+        <h2>Human Verification</h2>
+        <p>To ensure system security and prevent spam, please verify you are human to access the stream.</p>
 
-        <!-- टायमर आणि Continue बटन -->
-        <button id="continueBtn" class="btn" disabled>Please wait (10s)...</button>
+        <button id="verifyBtn" class="btn">Verify as Human</button>
     </div>
 
     <script>
         // Telegram Mini App सुरु करणे
         let tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // ॲप फुल स्क्रीन करणे
 
-        let timeLeft = 10; // १० सेकंदाचा टायमर
-        let btn = document.getElementById("continueBtn");
+        let btn = document.getElementById("verifyBtn");
 
-        // टायमर सुरु करण्याची प्रोसेस
-        let timer = setInterval(function() {
-            timeLeft--;
-            if (timeLeft > 0) {
-                btn.innerText = `Please wait (${timeLeft}s)...`;
-            } else {
-                clearInterval(timer);
-                btn.innerText = "Continue";
-                btn.disabled = false;
-                btn.classList.add("active");
-            }
-        }, 1000);
-
-        // जेव्हा युझर 'Continue' वर क्लिक करेल
+        // जेव्हा युझर बटनावर क्लिक करेल
         btn.addEventListener("click", function() {
-            if (!btn.disabled) {
-                btn.innerText = "Loading Ad...";
-                
-                // 2. तुमची Monetag ची जाहिरात दाखवणारा कोड
-                if (typeof show_11417452 === 'function') {
-                    show_11417452().then(() => {
-                        // जाहिरात बघून झाल्यावर काय करायचे (Verification Successful)
-                        btn.innerText = "Verified! Closing...";
-                        
-                        // थोड्या वेळाने मिनी ॲप बंद करणे आणि बॉट कडे परत जाणे
-                        setTimeout(() => {
-                            tg.close(); 
-                        }, 1000);
-                    }).catch((err) => {
-                        // जर जाहिरात लोड नाही झाली तर
-                        alert("Ad loading failed. Please try again.");
-                    });
-                } else {
-                    alert("Ad Script not loaded yet. Please wait a moment.");
-                }
+            btn.innerText = "🔄 Loading Secure Ad...";
+            btn.disabled = true; 
+            
+            // Monetag ची जाहिरात दाखवणे
+            if (typeof show_11417452 === 'function') {
+                show_11417452().then(() => {
+                    btn.innerText = "✅ Verified! Closing...";
+                    btn.style.background = "#10b981"; // हिरवा रंग
+                    
+                    // थोड्या वेळाने मिनी ॲप बंद करणे
+                    setTimeout(() => {
+                        tg.close(); 
+                    }, 1200);
+                }).catch((err) => {
+                    alert("Verification canceled or failed. Please try again.");
+                    btn.innerText = "Verify as Human";
+                    btn.disabled = false;
+                });
+            } else {
+                alert("Please wait a moment. Security script is loading...");
+                btn.innerText = "Verify as Human";
+                btn.disabled = false;
             }
         });
     </script>
