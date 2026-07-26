@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Verification</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- 1. तुमचा Monetag चा मुख्य टॅग -->
+    <script src='//libtl.com/sdk.js' data-zone='11417452' data-sdk='show_11417452'></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a; /* डार्क बॅकग्राउंड */
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: #1e293b;
+            padding: 30px 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: auto;
+            margin-top: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h2 { color: #10b981; margin-bottom: 10px; font-size: 24px; }
+        p { font-size: 15px; color: #cbd5e1; margin-bottom: 30px; }
+        .btn {
+            background-color: #475569;
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: not-allowed;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn.active {
+            background-color: #0284c7; /* टेलिग्राम सारखा निळा रंग */
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔒 Verification Check</h2>
+        <p>Please wait while we prepare your secure stream link.</p>
+
+        <!-- टायमर आणि Continue बटन -->
+        <button id="continueBtn" class="btn" disabled>Please wait (10s)...</button>
+    </div>
+
+    <script>
+        // Telegram Mini App सुरु करणे
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let timeLeft = 10; // १० सेकंदाचा टायमर
+        let btn = document.getElementById("continueBtn");
+
+        // टायमर सुरु करण्याची प्रोसेस
+        let timer = setInterval(function() {
+            timeLeft--;
+            if (timeLeft > 0) {
+                btn.innerText = `Please wait (${timeLeft}s)...`;
+            } else {
+                clearInterval(timer);
+                btn.innerText = "Continue";
+                btn.disabled = false;
+                btn.classList.add("active");
+            }
+        }, 1000);
+
+        // जेव्हा युझर 'Continue' वर क्लिक करेल
+        btn.addEventListener("click", function() {
+            if (!btn.disabled) {
+                btn.innerText = "Loading Ad...";
+                
+                // 2. तुमची Monetag ची जाहिरात दाखवणारा कोड
+                if (typeof show_11417452 === 'function') {
+                    show_11417452().then(() => {
+                        // जाहिरात बघून झाल्यावर काय करायचे (Verification Successful)
+                        btn.innerText = "Verified! Closing...";
+                        
+                        // थोड्या वेळाने मिनी ॲप बंद करणे आणि बॉट कडे परत जाणे
+                        setTimeout(() => {
+                            tg.close(); 
+                        }, 1000);
+                    }).catch((err) => {
+                        // जर जाहिरात लोड नाही झाली तर
+                        alert("Ad loading failed. Please try again.");
+                    });
+                } else {
+                    alert("Ad Script not loaded yet. Please wait a moment.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
